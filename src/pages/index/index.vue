@@ -2,7 +2,6 @@
 import { getHomeBannerAPI } from '@/services/home'
 import CustomNavbar from './components/CustomNavbar.vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
 import type { BannerItem } from '@/types/home'
 
 const bannerList = ref<BannerItem[]>([])
