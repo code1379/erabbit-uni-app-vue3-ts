@@ -13,6 +13,7 @@ export default defineConfig({
     AutoImport({
       imports: ['vue'],
       dts: './auto-imports.d.ts',
+      // eslintrc: { enabled: true },
     }),
   ],
 })
