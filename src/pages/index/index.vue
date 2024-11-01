@@ -7,6 +7,9 @@ import { onLoad } from '@dcloudio/uni-app'
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
 import HotPanel from './components/HotPanel.vue'
 import type { XtxGuessInstance } from '@/types/components'
+import PageSkeleton from './components/PageSkeleton.vue'
+
+const isLoading = ref(false)
 
 const bannerList = ref<BannerItem[]>([])
 const getHomeBannerData = async () => {
@@ -29,10 +32,10 @@ const getHomeHotData = async () => {
   hotList.value = res.result
 }
 
-onLoad(() => {
-  getHomeBannerData()
-  getHomeCategoryData()
-  getHomeHotData()
+onLoad(async () => {
+  isLoading.value = true
+  await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHotData()])
+  isLoading.value = false
 })
 
 // 获取猜你喜欢组件实例
@@ -66,10 +69,13 @@ const onRefresherrefresh = async () => {
     scroll-y
     @scrolltolower="onScrollTolower"
   >
-    <XtxSwiper :list="bannerList" />
-    <CategoryPanel :list="categoryList" />
-    <HotPanel :list="hotList" />
-    <XtxGuess ref="guessRef" />
+    <PageSkeleton v-if="isLoading" />
+    <template v-else>
+      <XtxSwiper :list="bannerList" />
+      <CategoryPanel :list="categoryList" />
+      <HotPanel :list="hotList" />
+      <XtxGuess ref="guessRef" />
+    </template>
   </scroll-view>
 </template>
 
