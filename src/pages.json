@@ -109,6 +109,14 @@
 					"style": {
 						"navigationBarTitleText": "设置"
 					}
+				},
+				{
+					"path": "profile/profile",
+					"style": {
+						"navigationBarTitleText": "个人信息",
+						"navigationStyle": "custom",
+						"navigationBarTextStyle": "white"
+					}
 				}
 			]
 		}
@@ -117,7 +125,9 @@
 	"preloadRule": {
 		"pages/my/my": {
 			"network": "all",
-			"packages": ["pagesMember"]
+			"packages": [
+				"pagesMember"
+			]
 		}
 	}
 }
