@@ -4,7 +4,9 @@ import { getHomeBannerAPI } from '@/services/home'
 import type { CategoryTopItem } from '@/types/category'
 import type { BannerItem, CategoryItem } from '@/types/home'
 import { onLoad } from '@dcloudio/uni-app'
+import PageSkeleton from './components/PageSkeleton.vue'
 
+const isLoading = ref(false)
 const bannerList = ref<BannerItem[]>([])
 const getBannerData = async () => {
   const res = await getHomeBannerAPI(2)
@@ -25,9 +27,10 @@ const subCategoryList = computed(() => {
   return categoryList.value[activeIndex.value]?.children || []
 })
 
-onLoad(() => {
-  getBannerData()
-  getCategoryTopData()
+onLoad(async () => {
+  isLoading.value = true
+  await Promise.all([getBannerData(), getCategoryTopData()])
+  isLoading.value = false
 })
 </script>
 
@@ -39,8 +42,10 @@ onLoad(() => {
         <text class="icon-search">女靴</text>
       </view>
     </view>
+
+    <PageSkeleton v-if="isLoading" />
     <!-- 分类 -->
-    <view class="categories">
+    <view class="categories" v-else>
       <!-- 左侧：一级分类 -->
       <scroll-view class="primary" scroll-y>
         <view
