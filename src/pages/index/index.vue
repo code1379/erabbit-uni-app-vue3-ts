@@ -28,7 +28,6 @@ const hotList = ref<HotItem[]>([])
 
 const getHomeHotData = async () => {
   const res = await getHomeHotAPI()
-  console.log('res', res)
   hotList.value = res.result
 }
 

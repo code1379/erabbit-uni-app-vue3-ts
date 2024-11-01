@@ -4,6 +4,7 @@ import { useMemberStore } from '@/stores'
 
 // 请求基地址
 const baseURL = 'https://pcapi-xiaotuxian-front-devtest.itheima.net'
+// const baseURL = 'https://pcapi-xiaotuxian-front.itheima.net'
 
 // 拦截器配置
 const httpInterceptor = {
