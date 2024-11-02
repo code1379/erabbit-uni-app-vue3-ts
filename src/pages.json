@@ -146,6 +146,12 @@
 					"style": {
 						"navigationBarTitleText": "新建订单"
 					}
+				},
+				{
+					"path": "detail/detail",
+					"style": {
+						"navigationBarTitleText": "订单详情"
+					}
 				}
 			]
 		}
@@ -156,6 +162,12 @@
 			"network": "all",
 			"packages": [
 				"pagesMember"
+			]
+		},
+		"pages/cart/cart": {
+			"network": "all",
+			"packages": [
+				"pagesOrder"
 			]
 		}
 	}

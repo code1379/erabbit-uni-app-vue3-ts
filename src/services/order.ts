@@ -23,3 +23,14 @@ export const getMemberOrderPreNowAPI = (data: {
     data,
   })
 }
+/**
+ * 提交订单
+ * @param data 请求参数
+ */
+export const postMemberOrderAPI = (data: OrderCreateParams) => {
+  return http<{ id: string }>({
+    method: 'POST',
+    url: '/member/order',
+    data,
+  })
+}
