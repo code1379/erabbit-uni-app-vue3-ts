@@ -11,9 +11,11 @@ const orderTabs = ref([
   { orderState: 3, title: '待收货' },
   { orderState: 4, title: '待评价' },
 ])
-
+const query = defineProps<{
+  type: string
+}>()
 // 高亮下标
-const activeIndex = ref(0)
+const activeIndex = ref(orderTabs.value.findIndex((v) => v.orderState === Number(query.type)))
 
 const handleSwiperChange: UniHelper.SwiperOnChange = (ev) => {
   activeIndex.value = ev.detail.current
