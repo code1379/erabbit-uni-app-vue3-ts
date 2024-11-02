@@ -137,6 +137,17 @@
 					}
 				}
 			]
+		},
+		{
+			"root": "pagesOrder",
+			"pages": [
+				{
+					"path": "create/create",
+					"style": {
+						"navigationBarTitleText": "新建订单"
+					}
+				}
+			]
 		}
 	],
 	// 分包预加载规则
