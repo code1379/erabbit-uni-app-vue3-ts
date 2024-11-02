@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { deleteMemberAddressByIdAPI, getMemberAddressAPI } from '@/services/address'
+import { useAddressStore } from '@/stores/modules/address'
 import type { AddressItem } from '@/types/address'
 import { onShow } from '@dcloudio/uni-app'
 
@@ -30,6 +31,15 @@ const onDeleteAddress = (id: string) => {
     },
   })
 }
+
+// 修改收货地址
+const onChangeAddress = (item: AddressItem) => {
+  console.log('item', item)
+  // 修改地址
+  const addressStore = useAddressStore()
+  addressStore.changeSelectedAddress(item)
+  uni.navigateBack()
+}
 </script>
 
 <template>
@@ -40,7 +50,7 @@ const onDeleteAddress = (id: string) => {
         <uni-swipe-action class="address-list">
           <!-- 收货地址项 -->
           <uni-swipe-action-item class="item" v-for="item in addressList" :key="item.id">
-            <view class="item-content">
+            <view class="item-content" @tap="onChangeAddress(item)">
               <view class="user">
                 {{ item.receiver }}
                 <text class="contact">{{ item.contact }}</text>
@@ -51,6 +61,7 @@ const onDeleteAddress = (id: string) => {
                 class="edit"
                 hover-class="none"
                 :url="`/pagesMember/address-form/address-form?id=${item.id}`"
+                @tap.stop="() => {}"
               >
                 修改
               </navigator>
@@ -61,7 +72,7 @@ const onDeleteAddress = (id: string) => {
             </template>
           </uni-swipe-action-item>
           <!-- 收货地址项 -->
-          <view class="item">
+          <!-- <view class="item">
             <view class="item-content">
               <view class="user">
                 黑马小公主
@@ -77,7 +88,7 @@ const onDeleteAddress = (id: string) => {
                 修改
               </navigator>
             </view>
-          </view>
+          </view> -->
         </uni-swipe-action>
       </view>
       <view v-else class="blank">暂无收货地址</view>
