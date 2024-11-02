@@ -12,6 +12,7 @@ import type {
   SkuPopupLocaldata,
 } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
 import { postMemberCartAPI } from '@/services/cart'
+import { useAddressStore } from '@/stores/modules/address'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -117,6 +118,15 @@ const openPopup = (name: typeof popupName.value) => {
   // 打开弹出层
   popup.value?.open()
 }
+
+// 立即购买
+const onBuyNow = (ev: SkuPopupEvent) => {
+  uni.navigateTo({
+    url: `/pagesOrder/create/create?skuId=${ev._id}&count=${ev.buy_num}&addressId=${addressStore.selectedAddress?.id}`,
+  })
+}
+
+const addressStore = useAddressStore()
 </script>
 
 <template>
@@ -136,6 +146,7 @@ const openPopup = (name: typeof popupName.value) => {
         backgroundColor: '#E9F8F5',
       }"
       @add-cart="onAddCart"
+      @buy-now="onBuyNow"
     />
     <scroll-view scroll-y class="viewport">
       <!-- 基本信息 -->

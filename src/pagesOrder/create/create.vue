@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getMemberOrderPreAPI } from '@/services/order'
+import { getMemberOrderPreAPI, getMemberOrderPreNowAPI } from '@/services/order'
 import { useAddressStore } from '@/stores/modules/address'
 import type { OrderPreResult } from '@/types/order'
 import { onLoad } from '@dcloudio/uni-app'
@@ -24,11 +24,30 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
   activeIndex.value = ev.detail.value
 }
 
+// 页面参数
+const query = defineProps<{
+  skuId?: string
+  count?: string
+  addressId?: string
+}>()
+
 // 获取订单信息
-const orederPre = ref<OrderPreResult>()
+const orderPre = ref<OrderPreResult>()
 const getMemberOrderPreData = async () => {
-  const res = await getMemberOrderPreAPI()
-  orederPre.value = res.result
+  // 是否有立即购买参数
+  if (query.count && query.skuId) {
+    // 调用立即购买 API
+    const res = await getMemberOrderPreNowAPI({
+      count: query.count,
+      skuId: query.skuId,
+      addressId: query.addressId,
+    })
+    orderPre.value = res.result
+  } else {
+    // 调用预付订单 API
+    const res = await getMemberOrderPreAPI()
+    orderPre.value = res.result
+  }
 }
 
 onLoad(() => {
@@ -37,7 +56,7 @@ onLoad(() => {
 
 const addressStore = useAddressStore()
 const selectedAddress = computed(() => {
-  return addressStore.selectedAddress || orederPre.value?.userAddresses.find((v) => v.isDefault)
+  return addressStore.selectedAddress || orderPre.value?.userAddresses.find((v) => v.isDefault)
 })
 </script>
 
@@ -66,12 +85,13 @@ const selectedAddress = computed(() => {
       <text class="icon icon-right"></text>
     </navigator>
 
+    <!-- :url="`/pages/goods/goods?id={item.id}`" -->
     <!-- 商品信息 -->
     <view class="goods">
       <navigator
-        v-for="item in orederPre?.goods"
+        v-for="item in orderPre?.goods"
         :key="item.skuId"
-        :url="`/pages/goods/goods?id={item.id}`"
+        :url="`/pages/goods/goods?id=${item.id}`"
         class="item"
         hover-class="none"
       >
@@ -111,11 +131,11 @@ const selectedAddress = computed(() => {
     <view class="settlement">
       <view class="item">
         <text class="text">商品总价: </text>
-        <text class="number symbol">{{ orederPre?.summary.totalPrice.toFixed(2) }}</text>
+        <text class="number symbol">{{ orderPre?.summary.totalPrice.toFixed(2) }}</text>
       </view>
       <view class="item">
         <text class="text">运费: </text>
-        <text class="number symbol">{{ orederPre?.summary.postFee.toFixed(2) }}</text>
+        <text class="number symbol">{{ orderPre?.summary.postFee.toFixed(2) }}</text>
       </view>
     </view>
   </scroll-view>
@@ -123,7 +143,7 @@ const selectedAddress = computed(() => {
   <!-- 吸底工具栏 -->
   <view class="toolbar" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
     <view class="total-pay symbol">
-      <text class="number">{{ orederPre?.summary.totalPayPrice.toFixed(2) }}</text>
+      <text class="number">{{ orderPre?.summary.totalPayPrice.toFixed(2) }}</text>
     </view>
     <view class="button" :class="{ disabled: true }"> 提交订单 </view>
   </view>
