@@ -4,9 +4,10 @@ import { OrderState, orderStateList } from '@/services/contants'
 import {
   getMemberOrderByIdAPI,
   getMemberOrderConsignmentByIdAPI,
+  getMemberOrderLogisticsByIdAPI,
   putMemberOrderReceiptByIdAPI,
 } from '@/services/order'
-import type { OrderResult } from '@/types/order'
+import type { LogisticItem, OrderLogisticResult, OrderResult } from '@/types/order'
 import { onLoad, onReady } from '@dcloudio/uni-app'
 import { getPayMockAPI, getPayWxPayMiniPayAPI } from '@/services/pay'
 
@@ -74,9 +75,21 @@ onReady(() => {
 
 // 获取订单详情
 const order = ref<OrderResult>()
+// 物流信息
+const logistics = ref<LogisticItem[]>([])
 const getMemberOrderByIdData = async () => {
   const res = await getMemberOrderByIdAPI(query.id)
-  order.value = res.result
+  const result = res.result
+  order.value = result
+
+  if (
+    [OrderState.DaiShouHuo, OrderState.DaiPingJia, OrderState.YiWanCheng].includes(
+      result.orderState,
+    )
+  ) {
+    const res = await getMemberOrderLogisticsByIdAPI(query.id)
+    logistics.value = res.result.list
+  }
 }
 
 onLoad(() => {
@@ -201,43 +214,39 @@ const onOrderConfirm = () => {
       <!-- 配送状态 -->
       <view class="shipment">
         <!-- 订单物流信息 -->
-        <view v-for="item in 1" :key="item" class="item">
+        <view v-for="item in logistics" :key="item.id" class="item">
           <view class="message">
-            您已在广州市天河区黑马程序员完成取件，感谢使用菜鸟驿站，期待再次为您服务。
+            {{ item.text }}
           </view>
-          <view class="date"> 2023-04-14 13:14:20 </view>
+          <view class="date"> {{ item.time }} </view>
         </view>
         <!-- 用户收货地址 -->
         <view class="locate">
-          <view class="user"> 张三 13333333333 </view>
-          <view class="address"> 广东省 广州市 天河区 黑马程序员 </view>
+          <view class="user"> {{ order.receiverContact }} {{ order.receiverMobile }} </view>
+          <view class="address"> {{ order.receiverAddress }} </view>
         </view>
       </view>
-
       <!-- 商品信息 -->
       <view class="goods">
         <view class="item">
           <navigator
             class="navigator"
-            v-for="item in 2"
+            v-for="item in order.skus"
             :key="item"
-            :url="`/pages/goods/goods?id=${item}`"
+            :url="`/pages/goods/goods?id=${item.id}`"
             hover-class="none"
           >
-            <image
-              class="cover"
-              src="https://yanxuan-item.nosdn.127.net/c07edde1047fa1bd0b795bed136c2bb2.jpg"
-            ></image>
+            <image class="cover" :src="item.image"></image>
             <view class="meta">
-              <view class="name ellipsis">ins风小碎花泡泡袖衬110-160cm</view>
-              <view class="type">藏青小花， 130</view>
+              <view class="name ellipsis">{{ item.name }}</view>
+              <view class="type">{{ item.attrsText }}</view>
               <view class="price">
                 <view class="actual">
                   <text class="symbol">¥</text>
-                  <text>99.00</text>
+                  <text>{{ item.curPrice }}</text>
                 </view>
               </view>
-              <view class="quantity">x1</view>
+              <view class="quantity">x{{ item.quantity }}</view>
             </view>
           </navigator>
           <!-- 待评价状态:展示按钮 -->
@@ -250,15 +259,15 @@ const onOrderConfirm = () => {
         <view class="total">
           <view class="row">
             <view class="text">商品总价: </view>
-            <view class="symbol">99.00</view>
+            <view class="symbol">{{ order.totalMoney }}</view>
           </view>
           <view class="row">
             <view class="text">运费: </view>
-            <view class="symbol">10.00</view>
+            <view class="symbol">{{ order.postFee }}</view>
           </view>
           <view class="row">
             <view class="text">应付金额: </view>
-            <view class="symbol primary">109.00</view>
+            <view class="symbol primary">{{ order.payMoney }}</view>
           </view>
         </view>
       </view>
