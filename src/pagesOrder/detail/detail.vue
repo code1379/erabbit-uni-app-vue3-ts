@@ -2,6 +2,7 @@
 import { useGuessList } from '@/composables'
 import { OrderState, orderStateList } from '@/services/contants'
 import {
+  deleteMemberOrderAPI,
   getMemberOrderByIdAPI,
   getMemberOrderConsignmentByIdAPI,
   getMemberOrderLogisticsByIdAPI,
@@ -143,6 +144,20 @@ const onOrderConfirm = () => {
     },
   })
 }
+
+// 删除订单
+const onDeleteOrder = async () => {
+  // 二次确认弹框
+  uni.showModal({
+    content: '确认删除订单吗？',
+    success: async (success) => {
+      if (success.confirm) {
+        const res = await deleteMemberOrderAPI({ ids: [order.value!.id] })
+        uni.redirectTo({ url: '/pagesOrder/list/list' })
+      }
+    },
+  })
+}
 </script>
 
 <template>
@@ -233,7 +248,7 @@ const onOrderConfirm = () => {
             class="navigator"
             v-for="item in order.skus"
             :key="item"
-            :url="`/pages/goods/goods?id=${item.id}`"
+            :url="`/pages/goods/goods?id=${item.spuId}`"
             hover-class="none"
           >
             <image class="cover" :src="item.image"></image>
@@ -279,7 +294,7 @@ const onOrderConfirm = () => {
           <view class="item">
             订单编号: {{ query.id }} <text class="copy" @tap="onCopy(query.id)">复制</text>
           </view>
-          <view class="item">下单时间: 2023-04-14 13:14:20</view>
+          <view class="item">下单时间: {{ order.createTime }}</view>
         </view>
       </view>
 
@@ -290,7 +305,7 @@ const onOrderConfirm = () => {
       <view class="toolbar-height" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }"></view>
       <view class="toolbar" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
         <!-- 待付款状态:展示支付按钮 -->
-        <template v-if="true">
+        <template v-if="order.orderState === OrderState.DaiFuKuan">
           <view class="button primary"> 去支付 </view>
           <view class="button" @tap="popup?.open?.()"> 取消订单 </view>
         </template>
@@ -304,11 +319,23 @@ const onOrderConfirm = () => {
             再次购买
           </navigator>
           <!-- 待收货状态: 展示确认收货 -->
-          <view class="button primary"> 确认收货 </view>
+          <view v-if="order?.orderState === OrderState.DaiShouHuo" class="button primary">
+            确认收货
+          </view>
           <!-- 待评价状态: 展示去评价 -->
-          <view class="button"> 去评价 </view>
+          <view class="button" v-if="order?.orderState === OrderState.DaiPingJia"> 去评价 </view>
           <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->
-          <view class="button delete"> 删除订单 </view>
+          <view
+            class="button delete"
+            v-if="
+              [OrderState.DaiPingJia, OrderState.YiWanCheng, OrderState.YiQuXiao].includes(
+                order.orderState,
+              )
+            "
+            @tap="onDeleteOrder"
+          >
+            删除订单
+          </view>
         </template>
       </view>
     </template>
