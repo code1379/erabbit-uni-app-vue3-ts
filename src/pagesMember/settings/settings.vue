@@ -29,9 +29,13 @@ const onLogout = () => {
     </view>
     <!-- 列表2 -->
     <view class="list">
+      <!-- #ifdef MP-WEIXIN -->
       <button hover-class="none" class="item arrow" open-type="openSetting">授权管理</button>
+      <!-- #endif -->
       <button hover-class="none" class="item arrow" open-type="feedback">问题反馈</button>
+      <!-- #ifdef MP-WEIXIN -->
       <button hover-class="none" class="item arrow" open-type="contact">联系我们</button>
+      <!-- #endif -->
     </view>
     <!-- 列表3 -->
     <view class="list">
